@@ -4,6 +4,7 @@ const dotenv = require("dotenv").config();
 const userRouter = require("./src/routes/user.routes");
 const db = require("./src/config/db");
 const roomRouter = require("./src/routes/room.routes");
+const contactRouter = require("./src/routes/contact.routes");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.get("/", (req, res) => {
   res.send("API Running Successfully");
 });
 
+app.use("/api/v1/contact", contactRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/room", roomRouter);
 
