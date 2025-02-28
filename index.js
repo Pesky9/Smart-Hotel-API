@@ -7,11 +7,15 @@ const userRouter = require("./src/routes/user.routes");
 const db = require("./src/config/db");
 const roomRouter = require("./src/routes/room.routes");
 const contactRouter = require("./src/routes/contact.routes");
+const DashboardRouter = require("./src/routes/dashboard.routes");
+const cron = require("node-cron");
+const couponModel = require("./src/models/coupon.model");
 
 const app = express();
 
-app.use(express.json());
 app.use(cookieParser());
+app.use(express.json());
+
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -31,12 +35,23 @@ app.get("/", (req, res) => {
 app.use("/api/v1/contact", contactRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/room", roomRouter);
+// app.use("/api/v1/dashboard", DashboardRouter);
 
 db.getConnection()
   .then(() => {
     console.log("Connected to the database successfully.");
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
+    });
+
+    cron.schedule("0 8 * * *", async () => {
+      console.log("Running birthday coupon cron job...");
+      try {
+        await couponModel.sendBirthdayCoupons();
+        console.log("Birthday coupons sent successfully.");
+      } catch (error) {
+        console.error("Error sending birthday coupons:", error);
+      }
     });
   })
   .catch((error) => {

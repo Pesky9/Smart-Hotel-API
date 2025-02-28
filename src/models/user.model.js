@@ -34,6 +34,20 @@ class User {
     );
     return rows;
   }
+  static async bookRoom({ guest_id, checkin_date, checkout_date }) {
+    const [result] = await db.execute(
+      `INSERT INTO bookings (guest_id, checkin_date, checkout_date) 
+       VALUES (?, ?, ?)`,
+      [guest_id, checkin_date, checkout_date]
+    );
+
+    const [newBooking] = await db.execute(
+      "SELECT * FROM bookings WHERE id = ?",
+      [result.insertId]
+    );
+
+    return newBooking[0];
+  }
 }
 
 module.exports = User;

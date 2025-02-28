@@ -60,6 +60,7 @@ const UserLogin = async (req, res) => {
     res.status(200).json({
       message: "Login successful.",
       token: token,
+      urole: user.urole,
     });
   } catch (error) {
     console.error(error);
@@ -116,8 +117,48 @@ const UserSignup = async (req, res) => {
   }
 };
 
-const UserBooking = (req, res) => {
-  console.log("Booking");
+const UserBooking = async (req, res) => {
+  const { guest_id, checkin_date, checkout_date } = req.body;
+
+  try {
+    const booking = await User.bookRoom({
+      guest_id,
+      checkin_date,
+      checkout_date,
+    });
+
+    res.status(200).json({ message: "Booking confirmed !", booking });
+  } catch (error) {
+    console.error("Error while booking:", error);
+    res.status(500).json({ message: "An error occurred during booking." });
+  }
 };
 
-module.exports = { GetAllUsers, UserLogin, UserSignup, UserBooking };
+const db = require("../config/db");
+
+const UserSurvey = async (req, res) => {
+  try {
+    const { user_id, ans } = req.body;
+    if (!user_id || !ans) {
+      return res
+        .status(400)
+        .json({ message: "User ID and answers are required" });
+    }
+
+    const query = "INSERT INTO survey (user_id, ans) VALUES (?, ?)";
+    await db.execute(query, [user_id, JSON.stringify(ans)]);
+
+    return res.status(200).json({ message: "Survey submitted successfully" });
+  } catch (error) {
+    console.error("Survey submission failed:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = {
+  GetAllUsers,
+  UserLogin,
+  UserSignup,
+  UserBooking,
+  UserSurvey,
+};

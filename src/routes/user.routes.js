@@ -4,6 +4,7 @@ const {
   UserBooking,
   UserSignup,
   GetAllUsers,
+  UserSurvey,
 } = require("../controllers/user.controllers");
 const authMiddleware = require("../middlewares/auth");
 
@@ -12,7 +13,8 @@ const userRouter = express.Router();
 userRouter.get("/all", GetAllUsers);
 userRouter.post("/login", UserLogin);
 userRouter.post("/signup", UserSignup);
-userRouter.get("/book-room", UserBooking);
+userRouter.post("/book-room", UserBooking);
+userRouter.post("/survey", UserSurvey);
 userRouter.get("/verify", authMiddleware, (req, res) => {
   res.json({ user: req.user });
 });
