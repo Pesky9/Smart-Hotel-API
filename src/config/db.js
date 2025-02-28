@@ -1,11 +1,11 @@
 const mysql = require("mysql2");
 
 const pool = mysql.createPool({
-  host: "mysql-17ff731d-sudhi2k03-555a.l.aivencloud.com",
-  user: "avnadmin",
-  password: "AVNS_oMis-sE7wcWCvJAtAGM",
-  database: "defaultdb",
-  port: 10938,
+  host: process.env.HOST,
+  user: process.env.USER,
+  password: process.env.PASS,
+  database: process.env.DB,
+  port: process.env.PORT,
 });
 
 module.exports = pool.promise();
