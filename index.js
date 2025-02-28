@@ -1,6 +1,7 @@
 const http = require("http");
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv").config();
 const userRouter = require("./src/routes/user.routes");
 const db = require("./src/config/db");
@@ -10,7 +11,15 @@ const contactRouter = require("./src/routes/contact.routes");
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      callback(null, true);
+    },
+    credentials: true,
+  })
+);
 
 http.createServer(app);
 const PORT = 5000;

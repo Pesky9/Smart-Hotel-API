@@ -42,12 +42,16 @@ const UserLogin = async (req, res) => {
       return res.status(401).json({ message: "Incorrect Password." });
     }
 
-    const payload = { id: user.id, email: user.email, urole: user.urole };
+    const payload = {
+      id: user.id,
+      uname: user.uname,
+      email: user.email,
+      urole: user.urole,
+    };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -55,13 +59,7 @@ const UserLogin = async (req, res) => {
 
     res.status(200).json({
       message: "Login successful.",
-      user: {
-        id: user.id,
-        uname: user.uname,
-        email: user.email,
-        phone_number: user.phone_number,
-        urole: user.urole,
-      },
+      token: token,
     });
   } catch (error) {
     console.error(error);
@@ -95,6 +93,7 @@ const UserSignup = async (req, res) => {
 
     const payload = {
       id: newUser.id,
+      uname: newUser.uname,
       email: newUser.email,
       urole: newUser.urole,
     };
@@ -109,13 +108,7 @@ const UserSignup = async (req, res) => {
 
     res.status(201).json({
       message: "User registered successfully.",
-      user: {
-        id: newUser.id,
-        uname: newUser.uname,
-        email: newUser.email,
-        urole: newUser.urole,
-        phone_number: newUser.phone_number,
-      },
+      token: token,
     });
   } catch (error) {
     console.error(error);
