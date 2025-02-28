@@ -1,5 +1,6 @@
 const http = require("http");
 const express = require("express");
+const cors = require("cors");
 const dotenv = require("dotenv").config();
 const userRouter = require("./src/routes/user.routes");
 const db = require("./src/config/db");
@@ -9,6 +10,7 @@ const contactRouter = require("./src/routes/contact.routes");
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 http.createServer(app);
 const PORT = 5000;
