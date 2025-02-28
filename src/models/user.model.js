@@ -19,6 +19,21 @@ class User {
     ]);
     return newUser[0];
   }
+
+  static async findAll() {
+    const [rows] = await db.execute(
+      "SELECT id, uname, email, phone_number, urole, created_at FROM users"
+    );
+    return rows;
+  }
+
+  static async findByRole(role) {
+    const [rows] = await db.execute(
+      "SELECT id, uname, email, phone_number, urole, created_at FROM users WHERE urole = ?",
+      [role]
+    );
+    return rows;
+  }
 }
 
 module.exports = User;

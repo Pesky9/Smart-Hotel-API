@@ -3,6 +3,7 @@ const express = require("express");
 const dotenv = require("dotenv").config();
 const userRouter = require("./src/routes/user.routes");
 const db = require("./src/config/db");
+const roomRouter = require("./src/routes/room.routes");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/room", roomRouter);
 
 db.getConnection()
   .then(() => {

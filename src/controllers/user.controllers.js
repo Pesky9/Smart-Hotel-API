@@ -2,6 +2,32 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 
+const GetAllUsers = async (req, res) => {
+  try {
+    const { role } = req.query;
+
+    let users;
+    if (role) {
+      users = await User.findByRole(role);
+      if (!users.length) {
+        return res
+          .status(404)
+          .json({ message: `No users found with role: ${role}` });
+      }
+    } else {
+      users = await User.findAll();
+      if (!users.length) {
+        return res.status(404).json({ message: "No users found." });
+      }
+    }
+
+    res.status(200).json({ users });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error." });
+  }
+};
+
 const UserLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -101,4 +127,4 @@ const UserBooking = (req, res) => {
   console.log("Booking");
 };
 
-module.exports = { UserLogin, UserSignup, UserBooking };
+module.exports = { GetAllUsers, UserLogin, UserSignup, UserBooking };
