@@ -34,11 +34,17 @@ class User {
     );
     return rows;
   }
-  static async bookRoom({ guest_id, checkin_date, checkout_date }) {
+  static async bookRoom({
+    guest_id,
+    checkin_date,
+    checkout_date,
+    price,
+    room_type,
+  }) {
     const [result] = await db.execute(
-      `INSERT INTO bookings (guest_id, checkin_date, checkout_date) 
-       VALUES (?, ?, ?)`,
-      [guest_id, checkin_date, checkout_date]
+      `INSERT INTO bookings (guest_id, checkin_date, checkout_date, price, room_type) 
+       VALUES (?, ?, ?, ?, ?)`,
+      [guest_id, checkin_date, checkout_date, price, room_type]
     );
 
     const [newBooking] = await db.execute(
@@ -47,6 +53,13 @@ class User {
     );
 
     return newBooking[0];
+  }
+  static async getUsersWithBirthday(today) {
+    const [rows] = await db.execute(
+      "SELECT id, uname, email FROM users WHERE DATE_FORMAT(dob, '%m-%d') = ?",
+      [today]
+    );
+    return rows;
   }
 }
 

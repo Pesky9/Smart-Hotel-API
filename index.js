@@ -35,7 +35,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1/contact", contactRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/room", roomRouter);
-// app.use("/api/v1/dashboard", DashboardRouter);
+app.use("/api/v1/dashboard", DashboardRouter);
 
 db.getConnection()
   .then(() => {
@@ -47,12 +47,35 @@ db.getConnection()
     cron.schedule("0 8 * * *", async () => {
       console.log("Running birthday coupon cron job...");
       try {
-        await couponModel.sendBirthdayCoupons();
+        const today = new Date().toISOString().slice(5, 10);
+        const users = await userModel.getUsersWithBirthday(today);
+
+        if (users.length === 0) {
+          console.log("No birthdays today.");
+          return;
+        }
+
+        for (let user of users) {
+          const couponCode = generateCouponCode();
+          const discount = 20;
+
+          await couponModel.storeCoupon({
+            code: couponCode,
+            discount: discount,
+          });
+
+          console.log(`Coupon ${couponCode} sent to user ${user.email}`);
+        }
+
         console.log("Birthday coupons sent successfully.");
       } catch (error) {
         console.error("Error sending birthday coupons:", error);
       }
     });
+
+    function generateCouponCode() {
+      return Math.random().toString(36).substring(2, 10).toUpperCase();
+    }
   })
   .catch((error) => {
     console.error("Failed to connect to the database:", error.message);

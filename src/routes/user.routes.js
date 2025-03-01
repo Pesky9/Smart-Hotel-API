@@ -5,6 +5,7 @@ const {
   UserSignup,
   GetAllUsers,
   UserSurvey,
+  checkCoupon,
 } = require("../controllers/user.controllers");
 const authMiddleware = require("../middlewares/auth");
 
@@ -18,5 +19,7 @@ userRouter.post("/survey", UserSurvey);
 userRouter.get("/verify", authMiddleware, (req, res) => {
   res.json({ user: req.user });
 });
+
+userRouter.post("/coupon", checkCoupon);
 
 module.exports = userRouter;

@@ -118,16 +118,30 @@ const UserSignup = async (req, res) => {
 };
 
 const UserBooking = async (req, res) => {
-  const { guest_id, checkin_date, checkout_date } = req.body;
+  const {
+    guest_id,
+    checkin_date,
+    checkout_date,
+    price,
+    room_type,
+    couponCode,
+  } = req.body;
 
   try {
     const booking = await User.bookRoom({
       guest_id,
       checkin_date,
       checkout_date,
+      price,
+      room_type,
     });
 
-    res.status(200).json({ message: "Booking confirmed !", booking });
+    if (couponCode) {
+      await couponModel.deleteCoupon(couponCode);
+      console.log(`Coupon ${couponCode} deleted from the database.`);
+    }
+
+    res.status(200).json({ message: "Booking confirmed!", booking });
   } catch (error) {
     console.error("Error while booking:", error);
     res.status(500).json({ message: "An error occurred during booking." });
@@ -135,6 +149,7 @@ const UserBooking = async (req, res) => {
 };
 
 const db = require("../config/db");
+const couponModel = require("../models/coupon.model");
 
 const UserSurvey = async (req, res) => {
   try {
@@ -155,10 +170,31 @@ const UserSurvey = async (req, res) => {
   }
 };
 
+const checkCoupon = async (req, res) => {
+  try {
+    const { code } = req.body;
+    const [rows] = await db.execute(
+      "SELECT discount FROM coupon WHERE code = ?",
+      [code]
+    );
+    if (rows.length === 0) {
+      return res.json({ success: false, message: "Invalid coupon code" });
+    }
+    const { discount } = rows[0];
+    return res.json({ success: true, discount });
+  } catch (error) {
+    console.error("Error checking coupon:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
 module.exports = {
   GetAllUsers,
   UserLogin,
   UserSignup,
   UserBooking,
   UserSurvey,
+  checkCoupon,
 };
