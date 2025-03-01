@@ -113,6 +113,19 @@ const UserSignup = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
+    // Handling duplicate entry error
+    if (error.code === "ER_DUP_ENTRY") {
+      if (error.sqlMessage.includes("phone_number")) {
+        return res
+          .status(409)
+          .json({ message: "Phone number already in use." });
+      }
+      if (error.sqlMessage.includes("email")) {
+        return res.status(409).json({ message: "Email already in use." });
+      }
+    }
+
     res.status(500).json({ message: "Server error." });
   }
 };
